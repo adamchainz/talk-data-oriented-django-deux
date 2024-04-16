@@ -33,7 +33,7 @@
 </section>
 
 <section>
-	<h3>An “iffy” example</h3>
+  <h3>An “iffy” example</h3>
   <pre><code class="hljs python" data-trim>
     if x:
         return 1
@@ -45,7 +45,7 @@
 </section>
 
 <section data-auto-animate>
-	<h3>Disassembled</h3>
+  <h3>Disassembled</h3>
   <pre><code class="hljs python" data-trim data-line-numbers>
     >>> dis.dis(f)
     1           0 RESUME                   0
@@ -66,7 +66,7 @@
 </section>
 
 <section data-auto-animate>
-	<h3>Disassembled</h3>
+  <h3>Disassembled</h3>
   <pre><code class="hljs python" data-trim data-line-numbers="5,10">
     >>> dis.dis(f)
     1           0 RESUME                   0
@@ -92,33 +92,33 @@
 </section>
 
 <section>
-	<h3>Things that don’t exist in a processor</h3>
-	<p class=fragment>Functions</p>
-	<p class=fragment>Classes</p>
-	<p class=fragment>Objects</p>
-	<p class=fragment>Programs</p>
+  <h3>Things that don’t exist in a processor</h3>
+  <p class=fragment>Functions</p>
+  <p class=fragment>Classes</p>
+  <p class=fragment>Objects</p>
+  <p class=fragment>Programs</p>
 </section>
 
 <section>
-	<h3>Things that do exist in a processor</h3>
-	<p class=fragment>1</p>
-	<p class=fragment>0</p>
-	<!-- Okay, we went too low level, try again -->
+  <h3>Things that do exist in a processor</h3>
+  <p class=fragment>1</p>
+  <p class=fragment>0</p>
+  <!-- Okay, we went too low level, try again -->
 </section>
 
 <section>
-	<h3>Things that do exist in a processor</h3>
-	<p class=fragment>Instructions</p>  <!-- relatively basic -->
-	<p class=fragment>Data</p>  <!-- layout remains -->
+  <h3>Things that do exist in a processor</h3>
+  <p class=fragment>Instructions</p>  <!-- relatively basic -->
+  <p class=fragment>Data</p>  <!-- layout remains -->
 </section>
 
 <section>
-	<h3>Assembly code</h3>
+  <h3>Assembly code</h3>
   <pre><code class="hljs" data-trim>
-    ldr	w8, [sp, #8] ; Load from stack into w8
-    ldr	w9, [sp, #4] ; Load from stack into w9
-    add	w8, w8, w9   ; w8 = w8 + w9
-    str	w8, [sp, #8] ; Store w8 on stack
+    ldr w8, [sp, #8] ; Load from stack into w8
+    ldr w9, [sp, #4] ; Load from stack into w9
+    add w8, w8, w9   ; w8 = w8 + w9
+    str w8, [sp, #8] ; Store w8 on stack
     b loop           ; Jump to label 'loop'
   </code></pre>
   <p class=fragment>General pattern: load, compute, store, more
@@ -126,28 +126,28 @@
 
 <!--
 <section>
-	<pre><code class="hljs arm" data-trim>
-		_Py_BytesMain:
-		sub        sp, sp, #0x30
-		stp        fp, lr, [sp, #0x20]
-		add        fp, sp, #0x20
-		sxtw       x8, w0
-		str        x8, [sp, #-0x10 + 16]
-		...
-	</code></pre>
+  <pre><code class="hljs arm" data-trim>
+    _Py_BytesMain:
+    sub        sp, sp, #0x30
+    stp        fp, lr, [sp, #0x20]
+    add        fp, sp, #0x20
+    sxtw       x8, w0
+    str        x8, [sp, #-0x10 + 16]
+    ...
+  </code></pre>
 </section>
  -->
 
 <!--
 <section data-auto-animate data-auto-animate-restart>
-	<h3>Categories of instructions</h3>
-	<!-- not quite comprehensive
-	<ol data-id=list>
-		<li><strong>Data movement</strong><span class=fragment data-fragment-index=1> - load, store, move, copy</span>
-		<li><strong>Math</strong><span class=fragment data-fragment-index=1>  - arithmetic, logic</span>
-		<li><strong>Control flow</strong><span class=fragment data-fragment-index=1> - conditions, jumps, atomics</span>
-	</ol>
-	<!-- all about data
+  <h3>Categories of instructions</h3>
+  <!-- not quite comprehensive
+  <ol data-id=list>
+    <li><strong>Data movement</strong><span class=fragment data-fragment-index=1> - load, store, move, copy</span>
+    <li><strong>Math</strong><span class=fragment data-fragment-index=1>  - arithmetic, logic</span>
+    <li><strong>Control flow</strong><span class=fragment data-fragment-index=1> - conditions, jumps, atomics</span>
+  </ol>
+  <!-- all about data
 </section>
 -->
 
@@ -156,35 +156,35 @@
 </section>
 
 <section data-background-color="#f8f8f8" data-auto-animate>
-	<!-- Now we are ready to define, or redefine, DOD -->
+  <!-- Now we are ready to define, or redefine, DOD -->
   <h2>Data-Oriented Design</h2>
 </section>
 
 <section data-background-color="#f8f8f8"  data-auto-animate>
-	<!-- Now we are ready to define, or redefine, DOD -->
+  <!-- Now we are ready to define, or redefine, DOD -->
   <h2>Data-Oriented Design</h2>
 
   <h3>Focus on the data transformation;</h3>
   <h3>everything else is secondary.</h3>
 
   <!--
-		That really means everything else secondary: OOP vs functional, sync vs async, Django versus Flask
-		Even make choices considered heretical
-	-->
+    That really means everything else secondary: OOP vs functional, sync vs async, Django versus Flask
+    Even make choices considered heretical
+  -->
 </section>
 
 <section>
-	<!-- In the rest of this talk we’ll cover... -->
-	<h2>Three considerations</h2>
-	<ol>
-		<li>Data layout
-		<li>Batching
-		<li>Statistical distribution  <!-- any better name? -->
-	</ol>
+  <!-- In the rest of this talk we’ll cover... -->
+  <h2>Three considerations</h2>
+  <ol>
+    <li>Data layout
+    <li>Batching
+    <li>Statistical distribution  <!-- any better name? -->
+  </ol>
 </section>
 
 <section>
-	<h2>1. Data layout</h2>
+  <h2>1. Data layout</h2>
 </section>
 
 <section>
@@ -192,8 +192,8 @@
 </section>
 
 <section>
-	<h2>OOP(s) / row-oriented</h2>
-  <pre data-id="code-animation"><code class="hljs python" data-trim>
+  <h2>OOP / Row-oriented</h2>
+  <pre><code class="hljs python" data-trim>
     class Point:
         def __init__(self, x, y):
             self.x = x
@@ -208,7 +208,7 @@
 </section>
 
 <section>
-  <pre data-id="code-animation"><code class="hljs python" data-trim>
+  <pre><code class="hljs python" data-trim>
     def mean_point():
         return Point(
             sum(p.x for p in points) / len(points),
@@ -218,15 +218,15 @@
 </section>
 
 <section>
-  <pre data-id="code-animation"><code class="hljs python" data-trim>
+  <pre><code class="hljs python" data-trim>
     In [1]: %timeit mean_point()
     499 µs ± 5.61 µs per loop (mean ± std. dev.)
   </code></pre>
 </section>
 
 <section>
-	<h2>Column-oriented</h2>
-  <pre data-id="code-animation"><code class="hljs python" data-trim>
+  <h2>Column-oriented</h2>
+  <pre><code class="hljs python" data-trim>
     xs = []
     ys = []
 
@@ -238,7 +238,7 @@
 </section>
 
 <section>
-  <pre data-id="code-animation"><code class="hljs python" data-trim>
+  <pre><code class="hljs python" data-trim>
     def mean_point2():
         return (
             sum(xs) / len(xs),
@@ -248,7 +248,7 @@
 </section>
 
 <section>
-  <pre data-id="code-animation"><code class="hljs python" data-trim>
+  <pre><code class="hljs python" data-trim>
     In [2]: %timeit mean_point2()
     54.9 µs ± 506 ns per loop (mean ± std. dev.)
   </code></pre>
@@ -256,8 +256,8 @@
 </section>
 
 <section>
-	<h2>Column-oriented arrays</h2>
-  <pre data-id="code-animation"><code class="hljs python" data-trim>
+  <h2>Column-oriented arrays</h2>
+  <pre><code class="hljs python" data-trim>
     import polars as pl
 
 
@@ -270,7 +270,7 @@
 </section>
 
 <section>
-  <pre data-id="code-animation"><code class="hljs python" data-trim>
+  <pre><code class="hljs python" data-trim>
     def mean_point3():
         return (
             points_dataframe['x'].mean(),
@@ -280,73 +280,191 @@
 </section>
 
 <section>
-  <pre data-id="code-animation"><code class="hljs python" data-trim>
+  <pre><code class="hljs python" data-trim>
     In [3]: %timeit mean_point3()
     3.11 µs ± 15.1 ns per loop (mean ± std. dev.)
   </code></pre>
   <p>~200× faster</p>
-  <p class=fragment>~15 years of hardware improvements</p>
 </section>
 
 <section>
-	<table>
-		<thead>
-			<tr><th>Method</th><th>Speed</th></tr>
-		</thead>
-		<tbody>
-			<tr><td>Row-oriented</td><td>500 µs</td></tr>
-			<tr><td>Column-oriented</td><td>50 µs</td></tr>
-			<tr><td>Column-oriented arrays</td><td>3 µs</td></tr>
-		</tbody>
-	</table>
-</section>
-
-<!-- Then three diagrams explaining data layout of each -->
-
-<section data-background-color="#f8f8f8">
-	<h2>Implications</h2>
-	<!-- Can’t really stop using Django models -->
-	<ol>
-		<li>Pull in the minimum of data
-		<li>Get your database to do work...
-	</ol>
+  <table>
+    <thead>
+      <tr><th>Method</th><th>Speed</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Row-oriented</td><td>500 µs</td></tr>
+      <tr><td>Column-oriented</td><td>50 µs</td></tr>
+      <tr><td>Column-oriented arrays</td><td>3 µs</td></tr>
+    </tbody>
+  </table>
+  <p class=fragment>~200× faster</p>
+  <p class=fragment>= ~15 years of hardware improvements</p>
 </section>
 
 <section>
-	<h2>2. Batching</h2>
-	<!--  - n+1, brandur on background tasks -->
-</section>
-
-<section data-background-color="#f8f8f8">
-	<h2>Implications</h2>
-	<ol>
-		<li>Always think in batches
-	</ol>
+  <h2>Row-oriented</h2>
+  <img src=img/row-oriented.svg class=r-stretch>
 </section>
 
 <section>
-	<h2>3. Statistical distribution</h2>
+  <h2>Column-oriented</h2>
+  <img src=img/column-oriented.svg class=r-stretch>
+</section>
+
+<section>
+  <h2>Column-oriented arrays</h2>
+  <img src=img/column-oriented-arrays.svg class=r-stretch>
+  <!-- lookahead -->
 </section>
 
 <section data-background-color="#f8f8f8">
-	<h2>Implications</h2>
-	<!-- Can’t really stop using Django models -->
-	<ol>
-		<li>Look at the data before making decisions
-	</ol>
+  <h2>Implications</h2>
+  <!-- Can’t really stop using Django models -->
+  <ol>
+    <li>Do more in your database: <code>Point.objects.aggregate(x=Avg("x"))</code>
+    <li>Write smaller models
+    <li>Use column-oriented databases for compute-heavy tasks
+    <li>Use dataframe libraries like Polars
+  </ol>
 </section>
 
 <section>
-  <h1>Thank you! 🤗</h1>
+  <h2>2. Batching</h2>
+  <!--  - n+1, brandur on background tasks -->
+</section>
+
+<section data-background-color="#f8f8f8">
+  <h2>Implications</h2>
+  <ol>
+    <li>Always think in batches
+  </ol>
+</section>
+
+<section>
+  <h2>3. Statistical distribution</h2>
+</section>
+
+<section>
+  <h2>Problem: <code>_route_to_regex()</code></h2>
+</section>
+
+<section>
+  <pre data-id=pre><code class="hljs python" data-trim data-line-numbers>
+    from django.urls import path
+    ...
+
+    urlpatterns = [
+        path("/p/&lt;int:user_id&gt;/", views.profile),
+    ]
+  </code></pre>
+</section>
+
+<section>
+  <pre data-id=pre><code class="hljs python" data-trim>
+		In [1]: _route_to_regex("/p/&lt;int:user_id&gt;/")
+		Out[1]:
+		('^/p/(?P&lt;user_id&gt;[0-9]+)/',
+		 {'user_id': &lt;...IntConverter at 0x101f056d0&gt;})
+  </code></pre>
+</section>
+
+<section data-auto-animate>
+  <h3>A surprising(?) optimization</h3>
+  <pre data-id=pre><code class="hljs diff" data-trim>
+     def _route_to_regex(route, is_endpoint):
+        ...
+  </code></pre>
+  <p>&nbsp;</p>
+</section>
+
+<section data-auto-animate>
+  <h3>A surprising(?) optimization</h3>
+  <pre data-id=pre><code class="hljs diff" data-trim>
+    +@functools.lru_cache
+     def _route_to_regex(route, is_endpoint):
+        ...
+  </code></pre>
+  <p class=fragment>Repeat calls ~100x faster.</p>
+</section>
+
+<section>
+  <h3>Data logging</h3>
+  <pre><code class="hljs python" data-trim>
+    all_routes = []
+
+    import atexit, pprint
+
+
+    @atexit.register
+    def print_routes():
+        pprint.pprint(all_routes)
+
+
+    def _route_to_regex(route, is_endpoint):
+        ...
+        all_routes.append(route)
+        ...
+  </code></pre>
+</section>
+
+<section>
+  <h3>Data logging</h3>
+  <pre><code class="hljs text" data-trim>
+    '',
+    'add/',
+    '&lt;path:object_id&gt;/history/',
+    '&lt;path:object_id&gt;/delete/',
+    '&lt;path:object_id&gt;/change/',
+    '&lt;path:object_id&gt;/',
+    ...
+    '',
+    'add/',
+    '&lt;path:object_id&gt;/history/',
+    '&lt;path:object_id&gt;/delete/',
+    '&lt;path:object_id&gt;/change/',
+    '&lt;path:object_id&gt;/',
+    ...
+  </code></pre>
+</section>
+
+<section>
+  <h3><code>ModelAdmin.get_urls()</code></h3>
+  <pre><code class="hljs python" data-trim>
+    def get_urls(self):
+        ...
+        return [
+            path("", ...),
+            path("add/", ...),
+            path(
+                "&lt;path:object_id&gt;/history/",
+                ...
+            ),
+            ...
+        ]
+  </code></pre>
+	<!-- Similar repetition likely in APIs and other autogenerated URLs -->
+</section>
+
+<section data-background-color="#f8f8f8">
+  <h2>Implications</h2>
+  <ol>
+    <li>Inspect your data, understand its properties
+    <li>Test more likely conditions first
+    <li>Add fast paths for common conditions
+    <li>Cache when repetition likely
+  </ol>
+</section>
+
+<section>
+  <h2>Thank you! 🤗</h2>
   <ul>
-    <li>Adam Johnson
-    <li>@adamchainz on GitHub &amp; Twitter
-    <li>me@adamj.eu
+    <li><a href=https://adamj.eu/contact>adamj.eu/contact</a>
+    <!-- TODO: make public -->
     <li><a href=https://github.com/adamchainz/talk-data-oriented-django-deux>github.com/adamchainz/talk-data-oriented-django-deux</a>
     <li>Books: <strong>Boost Your Django DX</strong>, <strong>Boost Your Git DX</strong>, <strong>Speed Up Your Django Tests</strong>
   </ul>
 </section>
-
 
 </div>
 </div>
