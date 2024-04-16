@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang=en>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Data-Oriented Django Deux</title>
+
+<link rel=stylesheet href=dist/reset.css>
+<link rel=stylesheet href=dist/reveal.css>
+<link rel=stylesheet href=dist/theme/django.css>
+
+<!-- Theme used for syntax highlighted code -->
+<link rel=stylesheet href=plugin/highlight/monokai.css>
+</head>
+<body>
+<div class=reveal>
+<div class=slides>
+
+<section>
+  <h1>Data-Oriented Django Deux</h1>
+  <h2>Adam Johnson</h2>
+</section>
+
+<section data-auto-animate data-background-color="#f8f8f8">
+  <h2>Most of your code does not exist</h2>
+</section>
+
+<section data-auto-animate data-background-color="#f8f8f8">
+  <h2>Most of your code does not exist</h2>
+  <h2>at runtime</h2>
+  <!-- Most of what we type in Python code does not neatly map onto something that runs -->
+</section>
+
+<section>
+	<h3>An “iffy” example</h3>
+  <pre><code class="hljs python" data-trim>
+    if x:
+        return 1
+    elif y:
+        return 2
+    else:
+        return 3
+  </code></pre>
+</section>
+
+<section data-auto-animate>
+	<h3>Disassembled</h3>
+  <pre><code class="hljs python" data-trim data-line-numbers>
+    >>> dis.dis(f)
+    1           0 RESUME                   0
+
+    2           2 LOAD_FAST                0 (x)
+                4 POP_JUMP_IF_FALSE        1 (to 8)
+
+    3           6 RETURN_CONST             1 (1)
+
+    4     >>    8 LOAD_FAST                1 (y)
+               10 POP_JUMP_IF_FALSE        1 (to 14)
+
+    5          12 RETURN_CONST             2 (2)
+
+    7     >>   14 RETURN_CONST             3 (3)
+  </code></pre>
+  <p>&nbsp;</p>
+</section>
+
+<section data-auto-animate>
+	<h3>Disassembled</h3>
+  <pre><code class="hljs python" data-trim data-line-numbers="5,10">
+    >>> dis.dis(f)
+    1           0 RESUME                   0
+
+    2           2 LOAD_FAST                0 (x)
+                4 POP_JUMP_IF_FALSE        1 (to 8)
+
+    3           6 RETURN_CONST             1 (1)
+
+    4     >>    8 LOAD_FAST                1 (y)
+               10 POP_JUMP_IF_FALSE        1 (to 14)
+
+    5          12 RETURN_CONST             2 (2)
+
+    7     >>   14 RETURN_CONST             3 (3)
+  </code></pre>
+  <p class=fragment><code>if</code>, <code>elif</code>, and <code>else</code> gone!</p>
+  <!-- they’ve been converted into faster but less safe VM instructions -->
+</section>
+
+<section>
+  <img src=img/layers.svg class=r-stretch>
+</section>
+
+<section>
+	<h3>Things that don’t exist in a processor</h3>
+	<p class=fragment>Functions</p>
+	<p class=fragment>Classes</p>
+	<p class=fragment>Objects</p>
+	<p class=fragment>Programs</p>
+</section>
+
+<section>
+	<h3>Things that do exist in a processor</h3>
+	<p class=fragment>1</p>
+	<p class=fragment>0</p>
+	<!-- Okay, we went too low level, try again -->
+</section>
+
+<section>
+	<h3>Things that do exist in a processor</h3>
+	<p class=fragment>Instructions</p>  <!-- relatively basic -->
+	<p class=fragment>Data</p>  <!-- layout remains -->
+</section>
+
+<section>
+	<h3>Assembly code</h3>
+  <pre><code class="hljs" data-trim>
+    ldr	w8, [sp, #8] ; Load from stack into w8
+    ldr	w9, [sp, #4] ; Load from stack into w9
+    add	w8, w8, w9   ; w8 = w8 + w9
+    str	w8, [sp, #8] ; Store w8 on stack
+    b loop           ; Jump to label 'loop'
+  </code></pre>
+  <p class=fragment>General pattern: load, compute, store, more
+</section>
+
+<!--
+<section>
+	<pre><code class="hljs arm" data-trim>
+		_Py_BytesMain:
+		sub        sp, sp, #0x30
+		stp        fp, lr, [sp, #0x20]
+		add        fp, sp, #0x20
+		sxtw       x8, w0
+		str        x8, [sp, #-0x10 + 16]
+		...
+	</code></pre>
+</section>
+ -->
+
+<!--
+<section data-auto-animate data-auto-animate-restart>
+	<h3>Categories of instructions</h3>
+	<!-- not quite comprehensive
+	<ol data-id=list>
+		<li><strong>Data movement</strong><span class=fragment data-fragment-index=1> - load, store, move, copy</span>
+		<li><strong>Math</strong><span class=fragment data-fragment-index=1>  - arithmetic, logic</span>
+		<li><strong>Control flow</strong><span class=fragment data-fragment-index=1> - conditions, jumps, atomics</span>
+	</ol>
+	<!-- all about data
+</section>
+-->
+
+<section>
+  <h2>Computers are data transformation machines</h2>
+</section>
+
+<section data-background-color="#f8f8f8" data-auto-animate>
+	<!-- Now we are ready to define, or redefine, DOD -->
+  <h2>Data-Oriented Design</h2>
+</section>
+
+<section data-background-color="#f8f8f8"  data-auto-animate>
+	<!-- Now we are ready to define, or redefine, DOD -->
+  <h2>Data-Oriented Design</h2>
+
+  <h3>Focus on the data transformation;</h3>
+  <h3>everything else is secondary.</h3>
+
+  <!--
+		That really means everything else secondary: OOP vs functional, sync vs async, Django versus Flask
+		Even make choices considered heretical
+	-->
+</section>
+
+<section>
+	<!-- In the rest of this talk we’ll cover... -->
+	<h2>Three considerations</h2>
+	<ol>
+		<li>Data layout
+		<li>Batching
+		<li>Statistical distribution  <!-- any better name? -->
+	</ol>
+</section>
+
+<section>
+	<h2>1. Data layout</h2>
+</section>
+
+<section>
+  <h2>Problem: find mean 2D point</h2>
+</section>
+
+<section>
+	<h2>OOP(s) / row-oriented</h2>
+  <pre data-id="code-animation"><code class="hljs python" data-trim>
+    class Point:
+        def __init__(self, x, y):
+            self.x = x
+            self.y = y
+
+    from random import random
+    points = [
+        Point(random(), random())
+        for _ in range(10_000)
+    ]
+  </code></pre>
+</section>
+
+<section>
+  <pre data-id="code-animation"><code class="hljs python" data-trim>
+    def mean_point():
+        return Point(
+            sum(p.x for p in points) / len(points),
+            sum(p.y for p in points) / len(points),
+        )
+  </code></pre>
+</section>
+
+<section>
+  <pre data-id="code-animation"><code class="hljs python" data-trim>
+    In [1]: %timeit mean_point()
+    499 µs ± 5.61 µs per loop (mean ± std. dev.)
+  </code></pre>
+</section>
+
+<section>
+	<h2>Column-oriented</h2>
+  <pre data-id="code-animation"><code class="hljs python" data-trim>
+    xs = []
+    ys = []
+
+    from random import random
+    for _ in range(10_000):
+        xs.append(random())
+        ys.append(random())
+  </code></pre>
+</section>
+
+<section>
+  <pre data-id="code-animation"><code class="hljs python" data-trim>
+    def mean_point2():
+        return (
+            sum(xs) / len(xs),
+            sum(ys) / len(ys),
+        )
+  </code></pre>
+</section>
+
+<section>
+  <pre data-id="code-animation"><code class="hljs python" data-trim>
+    In [2]: %timeit mean_point2()
+    54.9 µs ± 506 ns per loop (mean ± std. dev.)
+  </code></pre>
+  <p>10× faster</p>
+</section>
+
+<section>
+	<h2>Column-oriented arrays</h2>
+  <pre data-id="code-animation"><code class="hljs python" data-trim>
+    import polars as pl
+
+
+    # Generate 10,000 random 2D points
+    points_dataframe = pl.DataFrame({
+        'x': [random() for _ in range(10_000)],
+        'y': [random() for _ in range(10_000)]
+    })
+  </code></pre>
+</section>
+
+<section>
+  <pre data-id="code-animation"><code class="hljs python" data-trim>
+    def mean_point3():
+        return (
+            points_dataframe['x'].mean(),
+            points_dataframe['y'].mean(),
+        )
+  </code></pre>
+</section>
+
+<section>
+  <pre data-id="code-animation"><code class="hljs python" data-trim>
+    In [3]: %timeit mean_point3()
+    3.11 µs ± 15.1 ns per loop (mean ± std. dev.)
+  </code></pre>
+  <p>~200× faster</p>
+  <p class=fragment>~15 years of hardware improvements</p>
+</section>
+
+<section>
+	<table>
+		<thead>
+			<tr><th>Method</th><th>Speed</th></tr>
+		</thead>
+		<tbody>
+			<tr><td>Row-oriented</td><td>500 µs</td></tr>
+			<tr><td>Column-oriented</td><td>50 µs</td></tr>
+			<tr><td>Column-oriented arrays</td><td>3 µs</td></tr>
+		</tbody>
+	</table>
+</section>
+
+<!-- Then three diagrams explaining data layout of each -->
+
+<section data-background-color="#f8f8f8">
+	<h2>Implications</h2>
+	<!-- Can’t really stop using Django models -->
+	<ol>
+		<li>Pull in the minimum of data
+		<li>Get your database to do work...
+	</ol>
+</section>
+
+<section>
+	<h2>2. Batching</h2>
+	<!--  - n+1, brandur on background tasks -->
+</section>
+
+<section data-background-color="#f8f8f8">
+	<h2>Implications</h2>
+	<ol>
+		<li>Always think in batches
+	</ol>
+</section>
+
+<section>
+	<h2>3. Statistical distribution</h2>
+</section>
+
+<section data-background-color="#f8f8f8">
+	<h2>Implications</h2>
+	<!-- Can’t really stop using Django models -->
+	<ol>
+		<li>Look at the data before making decisions
+	</ol>
+</section>
+
+<section>
+  <h1>Thank you! 🤗</h1>
+  <ul>
+    <li>Adam Johnson
+    <li>@adamchainz on GitHub &amp; Twitter
+    <li>me@adamj.eu
+    <li><a href=https://github.com/adamchainz/talk-data-oriented-django-deux>github.com/adamchainz/talk-data-oriented-django-deux</a>
+    <li>Books: <strong>Boost Your Django DX</strong>, <strong>Boost Your Git DX</strong>, <strong>Speed Up Your Django Tests</strong>
+  </ul>
+</section>
+
+
+</div>
+</div>
+
+<script src=dist/reveal.js></script>
+<script src=plugin/highlight/highlight.js></script>
+<script>
+  Reveal.initialize({
+    controls: false,
+    hash: true,
+    plugins: [ RevealHighlight ],
+    progress: false,
+  });
+</script>
+</body>
+</html>
