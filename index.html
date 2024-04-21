@@ -130,6 +130,26 @@
   <p class=fragment>General pattern: load, compute, store, more
 </section>
 
+
+<!-- 
+  <💬> I love the really dramatic beginning of "most of your code doesn't exist" at the beginning - it almost gave me a heart attack 😂, and the dissembled code representation of the "if...elif...else" example is super helpful in understanding the lower level code instructions and that the things that don't exist in a processor, but so far it's not yet crystal clear to the audience how these general patterns of load, compute, store etc. is directly related to the topic (i.e., data) of this talk. 
+
+  The commented out part below seems to hint at where this is going though - would love to see it develop more!
+    <quote>
+        <section data-auto-animate data-auto-animate-restart>
+          <h3>Categories of instructions</h3>
+          <!-- not quite comprehensive 
+          <ol data-id=list>
+            <li><strong>Data movement</strong><span class=fragment data-fragment-index=1> - load, store, move, copy</span>
+            <li><strong>Math</strong><span class=fragment data-fragment-index=1>  - arithmetic, logic</span>
+            <li><strong>Control flow</strong><span class=fragment data-fragment-index=1> - conditions, jumps, atomics</span>
+          </ol>
+          <!-- all about data
+        </section>
+    </quote>
+  </💬>
+ -->
+
 <!--
 <section>
   <pre><code class="hljs arm" data-trim>
@@ -168,6 +188,9 @@
 
 <section data-background-color="#f8f8f8"  data-auto-animate>
   <!-- Now we are ready to define, or redefine, DOD -->
+  <!-- 
+    <💬> Assuming at least half of the audience are hearing about DOD for the first time ever or have not seen your first talk, it'd be great to spend a minute or two on this slide to explain what "data transformation" entails </💬>
+  -->
   <h2>Data-Oriented Design</h2>
 
   <h3>Focus on the data transformation;</h3>
@@ -182,6 +205,15 @@
 <section>
   <!-- In the rest of this talk we’ll cover... -->
   <h2>Three considerations</h2>
+  <!-- 
+    <💬> These three considerations seem to be coming from different angles - would love to see how they reflect the core principles of DOD 
+      - data layout -> how data is stored and retrieved -> how it affects speed of processing 
+      - batching -> how tasks should be processed
+          ?? some questions on this: how does this reflect the core principles of DOD? should we consider the differences between i/o bound vs. cpu bound tasks, or should we always be considering batching? would love to see a more concrete example of how to do batching in the DOD manner!
+      - statistical distribution -> from the talk it seems that what you meant by statistical distribution is the results of profiling that shows what are the top slowest tasks and how we can optimise them?
+          ?? some questions on this:  how does this reflect the core principles of DOD? shouldn't engineers be mindful of what are the slowest running tasks regardless of whether they subscribe to the idea of DOD? 
+    </💬>
+  -->
   <ol>
     <li>Data layout
     <li>Batching
@@ -326,10 +358,12 @@
 
 <section data-background-color="#f8f8f8">
   <h2>Implications</h2>
+  <!-- <💬> As mentioned in our chat after the talk, I'd love to see a bit more elaboration on these implications, as this would be the audience's main takeaways from the talk - maybe one per slide with an example explaining a bit about why? </💬> -->
   <!-- Can’t really stop using Django models -->
   <ol>
     <li>Do more in your database: <code>Point.objects.aggregate(x=Avg("x"))</code>
     <li>Write smaller models
+    <!-- <💬> I might be mistaken, but technically the above two points (do more in the db and write smaller models) are not exactly the same point as the above examples about data layout (row-oriented, column-oriented etc.)? I know this is probably related to your above comment with regard to "can't really stop using django models" but it's slightly confusing to for the audience to make the direct connection to your data layout examples </💬> -->
     <li>Use column-oriented databases for compute-heavy tasks
     <li>Use dataframe libraries like Polars
   </ol>
