@@ -39,7 +39,7 @@
 </section>
 
 <section>
-  <h3>An “iffy” example</h3>
+  <h3>An example</h3>
   <pre><code class="hljs python" data-trim>
     if x:
         return 1
@@ -98,6 +98,21 @@
 </section>
 
 <section>
+  <h3>Optimizations</h3>
+  <ul class=fragment>
+    <li>Constant folding
+    <li>JIT compiling
+    <li>Loop unrolling
+    <li>Tail-call optimization
+    <li>Inlining
+    <li>Speculative execution
+    <li>Parallel execution
+    <li>&hellip;
+  </ul>
+  <p class=fragment>See <strong>Wikipedia: Optimizing Compiler</strong>
+</section>
+
+<section>
   <h3>Things that don’t exist in a processor</h3>
   <p class=fragment>Functions</p>
   <p class=fragment>Classes</p>
@@ -119,6 +134,13 @@
 </section>
 
 <section>
+  <h3>Data optimizations</h3>
+  <p class=fragment>🤷
+  <p class=fragment>Generally, compilers cannot rearrange your data.
+</section>
+
+<!--
+<section>
   <h3>Assembly code</h3>
   <pre><code class="hljs" data-trim>
     ldr w8, [sp, #8] ; Load from stack into w8
@@ -130,7 +152,6 @@
   <p class=fragment>General pattern: load, compute, store, more
 </section>
 
-<!--
 <section>
   <pre><code class="hljs arm" data-trim>
     _Py_BytesMain:
@@ -155,10 +176,17 @@
   </ol>
   <!-- all about data
 </section>
--->
 
 <section>
   <h2>Computers are data transformation machines</h2>
+</section>
+-->
+
+<section data-background-color="#f8f8f8">
+  <h2>Most of your code does not exist</h2>
+  <h2>at runtime</h2>
+  <h2>in the same form.</h2>
+  <h2 class=fragment>But your data does.</h2>
 </section>
 
 <section data-background-color="#f8f8f8" data-auto-animate>
@@ -170,31 +198,28 @@
   <!-- Now we are ready to define, or redefine, DOD -->
   <h2>Data-Oriented Design</h2>
 
-  <h3>Focus on the data transformation;</h3>
-  <h3>everything else is secondary.</h3>
+  <h3>Focus on the data.</h3>
+  <h3><span>Everything</span> else is secondary.</h3>
 
   <!--
     That really means everything else secondary: OOP vs functional, sync vs async, Django versus Flask
-    Even make choices considered heretical
+    Somewhat anarchic approach to programming, can encourage “heretical” choices
   -->
 </section>
 
 <section>
   <!-- In the rest of this talk we’ll cover... -->
-  <h2>Three considerations</h2>
+  <h2>Three data considerations</h2>
   <ol>
-    <li>Data layout
+    <li>Layout
     <li>Batching
     <li>Statistical distribution  <!-- any better name? -->
   </ol>
 </section>
 
 <section>
-  <h2>1. Data layout</h2>
-</section>
-
-<section>
-  <h2>Problem: find mean 2D point</h2>
+  <h2>1. Layout</h2>
+  <h3>Problem: find mean of some 2D points</h3>
 </section>
 
 <section>
@@ -305,7 +330,7 @@
     </tbody>
   </table>
   <p class=fragment>~200× faster</p>
-  <p class=fragment>= ~15 years of hardware improvements</p>
+  <p class=fragment>~15 years of hardware improvements</p>
 </section>
 
 <section>
@@ -325,18 +350,40 @@
 </section>
 
 <section data-background-color="#f8f8f8">
-  <h2>Implications</h2>
-  <!-- Can’t really stop using Django models -->
-  <ol>
-    <li>Do more in your database: <code>Point.objects.aggregate(x=Avg("x"))</code>
-    <li>Write smaller models
-    <li>Use column-oriented databases for compute-heavy tasks
-    <li>Use dataframe libraries like Polars
-  </ol>
+  <h2>Layout techniques</h2>
+</section>
+
+<section data-background-color="#f8f8f8">
+  <h3>1. Do more in your database</h3>
+  <pre><code class="hljs python" data-trim>
+    def mean_point4():
+        d = Point.objects.aggregate(
+            x=Avg("x"),
+            y=Avg("y"),
+        )
+        return Point(x=d['x'], y=d['y'])
+  </code></pre>
+</section>
+
+<section data-background-color="#f8f8f8">
+  <h3>2. Use the right data types</h3>
+  <pre><code class="hljs python" data-trim>
+      class Book(models.Model):
+          # Bloated, up to N bytes
+          state = models.TextField(choices=...)
+          # Just right, 1 byte
+          state = models.PositiveSmallIntegerField(choices=...)
+  </code></pre>
+</section>
+
+<section data-background-color="#f8f8f8">
+  <h3>3. Use column-oriented tools for analysis</h3>
+  <p>Dataframes: Polars, Pandas, numpy, …
+  <p>DuckDB, Redshift, Snowflake, …
 </section>
 
 <section>
-  <h2>🚧 2. Batching</h2>
+  <h2>2. Batching</h2>
   <!--  - n+1, brandur on background tasks -->
 </section>
 
@@ -357,7 +404,7 @@
 
 <section>
   <pre data-id=pre><code class="hljs python" data-trim>
-    for user in users:
+    for user in affected_users:
         send_notification(change, user)
   </code></pre>
 </section>
@@ -378,13 +425,46 @@
 </section>
 
 <section data-background-color="#f8f8f8">
-  <h2>Implications</h2>
+  <h2>Batching techniques</h2>
+</section>
+
+<section data-background-color="#f8f8f8">
+  <h3>1. Avoid per-instance methods</h3>
+  <pre><code class="hljs diff" data-trim>
+     class User:
+         ...
+    -    def send_notification(self, change):
+    -        ...
+
+    +def send_notification(change, users):
+    +    ...
+  </code></pre>
+
   <ol>
     <li>Prefer batches
     <li>Avoid locking up functions as methods
     <li><code>Model.objects.bulk_update()</code>
     <li>Background tasks: prefer sweepers over singulars
   </ol>
+</section>
+
+<section data-background-color="#f8f8f8">
+  <h3>2. Read in batches</h3>
+</section>
+
+<section data-background-color="#f8f8f8">
+  <h3>3. Write in batches</h3>
+  <pre><code class="hljs diff" data-trim>
+    Widget.objects.bulk_create(widgets)
+
+    Widget.objects.bulk_update(widgets, fields=[...])
+
+    Widget.objects.bulk_create(
+        widgets,
+        update_conflicts=True,
+        update_fields=[...],
+    )
+  </code></pre>
 </section>
 
 <section>
@@ -503,10 +583,18 @@
 </section>
 
 <section>
+  <h2>References</h2>
+  <ul>
+    <li>Casey Muratori: “Clean code, horrible performance”
+    <li>Cal Peterson: “Take the tools out of 'Data', but don't take the data out of the tools”
+    <li>Brandur: “Atlanta, Job Queues, Batch-wise Operations”
+  </ul>
+</section>
+
+<section>
   <h2>Thank you! 🤗</h2>
   <ul>
     <li><a href=https://adamj.eu/contact>adamj.eu/contact</a>
-    <!-- TODO: make public -->
     <li><a href=https://github.com/adamchainz/talk-data-oriented-django-deux>github.com/adamchainz/talk-data-oriented-django-deux</a>
     <li>Books: <strong>Boost Your Django DX</strong>, <strong>Boost Your Git DX</strong>, <strong>Speed Up Your Django Tests</strong>
   </ul>
