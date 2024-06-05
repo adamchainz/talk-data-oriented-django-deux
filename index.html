@@ -12,6 +12,9 @@
 
 <!-- Theme used for syntax highlighted code -->
 <link rel=stylesheet href=plugin/highlight/monokai.css>
+<!-- <style media=screen>
+  .reveal-viewport {height: 80%}
+</style> -->
 </head>
 <body>
 <div class=reveal>
@@ -39,7 +42,6 @@
 </section>
 
 <section>
-  <h3>An example</h3>
   <pre><code class="hljs python" data-trim>
     if x:
         return 1
@@ -98,21 +100,6 @@
 </section>
 
 <section>
-  <h3>Optimizations</h3>
-  <ul class=fragment>
-    <li>Constant folding
-    <li>JIT compiling
-    <li>Loop unrolling
-    <li>Tail-call optimization
-    <li>Inlining
-    <li>Speculative execution
-    <li>Parallel execution
-    <li>&hellip;
-  </ul>
-  <p class=fragment>See <strong>Wikipedia: Optimizing Compiler</strong>
-</section>
-
-<section>
   <h3>Things that don’t exist in a processor</h3>
   <p class=fragment>Functions</p>
   <p class=fragment>Classes</p>
@@ -134,9 +121,28 @@
 </section>
 
 <section>
+  <h3>Instruction optimizations</h3>
+  <table>
+    <tr>
+      <td>Constant folding
+      <td>JIT compiling
+    <tr>
+      <td>Loop unrolling
+      <td>Tail-call optimization
+    <tr>
+      <td>Inlining
+      <td>Parallel execution
+    <tr>
+      <td>Instruction scheduling
+      <td>Register allocation
+  </table>
+  <p>Wikipedia: Optimizing Compiler
+</section>
+
+<section>
   <h3>Data optimizations</h3>
-  <p class=fragment>🤷
-  <p class=fragment>Generally, compilers cannot rearrange your data.
+  <p>🤷
+  <p>Generally, compilers cannot rearrange your data.
 </section>
 
 <!--
@@ -219,6 +225,9 @@
 
 <section>
   <h2>1. Layout</h2>
+</section>
+
+<section>
   <h3>Problem: find mean of some 2D points</h3>
 </section>
 
@@ -354,7 +363,13 @@
 </section>
 
 <section data-background-color="#f8f8f8">
-  <h3>1. Do more in your database</h3>
+  <h3>1. Use column-oriented tools</h3>
+  <p>Dataframes: Polars, Pandas, numpy, …
+  <p>DuckDB, Redshift, Snowflake, …
+</section>
+
+<section data-background-color="#f8f8f8">
+  <h3>2. Do more in your database</h3>
   <pre><code class="hljs python" data-trim>
     def mean_point4():
         d = Point.objects.aggregate(
@@ -363,10 +378,11 @@
         )
         return Point(x=d['x'], y=d['y'])
   </code></pre>
+  <!-- even if row-oriented, still faster than loading all data into Python -->
 </section>
 
 <section data-background-color="#f8f8f8">
-  <h3>2. Use the right data types</h3>
+  <h3>3. Use the right data types</h3>
   <pre><code class="hljs python" data-trim>
       class Book(models.Model):
           # Bloated, up to N bytes
@@ -377,10 +393,11 @@
 </section>
 
 <section data-background-color="#f8f8f8">
-  <h3>3. Use column-oriented tools for analysis</h3>
+  <h3>3. Use column-oriented tools</h3>
   <p>Dataframes: Polars, Pandas, numpy, …
   <p>DuckDB, Redshift, Snowflake, …
 </section>
+
 
 <section>
   <h2>2. Batching</h2>
@@ -388,39 +405,57 @@
 </section>
 
 <section>
-  <h2>Problem: sending notification emails</h2>
+  <h2><code>create_permissions()</code> optimization</h2>
+  <p>Ticket #35408
+  <p class=fragment>From 5.2ms to 2.7ms, 2× speedup
+  <p class=fragment>8.5% to 4.7% of time to run Django’s models tests
 </section>
 
 <section>
+  <pre><code class="hljs console" data-trim>
+    $ ./manage.py migrate
+  </code></pre>
+
+  <pre class=fragment><code class="hljs python" data-trim>
+    def emit_post_migrate_signal(...):
+        for app_config in apps.get_app_configs():
+            ...
+            post_migrate.send(...)
+  </code></pre>
+</section>
+
+<section data-auto-animate>
   <pre data-id=pre><code class="hljs python" data-trim>
-    def send_notification(change, user):
-        send_mail(
-            recipient_list=[user.email],
-            subject="Widget updated",
-            message=render_notification(change)
-        )
+    def create_permissions(...):
+        ...
+        ctypes = set()
+        for klass in app_config.get_models():
+            ctype = ContentType.objects.get_for_model(klass)
+            ctypes.add(ctype)
+        ...
+  </code></pre>
+</section>
+
+<section data-auto-animate>
+  <pre data-id=pre><code class="hljs python" data-trim>
+    def create_permissions(...):
+        ...
+        ctypes = ContentType.objects.get_for_models(*models)
+        ...
   </code></pre>
 </section>
 
 <section>
-  <pre data-id=pre><code class="hljs python" data-trim>
-    for user in affected_users:
-        send_notification(change, user)
-  </code></pre>
-</section>
+  <h3>🦈 We’re gonna need a bigger batch!</h3>
+  <pre><code class="hljs python" data-trim>
+    def emit_post_migrate_signal(...):
+        # All apps at once!
+        post_migrate_all.send(...)
 
-<section>
-  <pre data-id=pre><code class="hljs python" data-trim>
-    def send_notification(change, users):
-        subject = "Widget updated"
-        message = render_notification(change)
-        send_mass_mail(
-            subject=[
-                (subject, message, None, [user.email])
-                for user in users
-            ],
-
-        )
+        # Legacy.
+        for app_config in apps.get_app_configs():
+            ...
+            post_migrate.send(...)
   </code></pre>
 </section>
 
@@ -439,22 +474,16 @@
     +def send_notification(change, users):
     +    ...
   </code></pre>
-
-  <ol>
-    <li>Prefer batches
-    <li>Avoid locking up functions as methods
-    <li><code>Model.objects.bulk_update()</code>
-    <li>Background tasks: prefer sweepers over singulars
-  </ol>
 </section>
 
 <section data-background-color="#f8f8f8">
-  <h3>2. Read in batches</h3>
+  <h3>2. Prefer larger functions</h3>
+  <p><del>clean</del> <strong>efficient</strong> code
 </section>
 
 <section data-background-color="#f8f8f8">
-  <h3>3. Write in batches</h3>
-  <pre><code class="hljs diff" data-trim>
+  <h3>3. Use batch ORM methods</h3>
+  <pre><code class="hljs python" data-trim>
     Widget.objects.bulk_create(widgets)
 
     Widget.objects.bulk_update(widgets, fields=[...])
@@ -467,27 +496,32 @@
   </code></pre>
 </section>
 
+<section data-background-color="#f8f8f8">
+  <h3>4. Pre-emptively pluralize</h3>
+  <pre><code class="hljs diff" data-trim>
+     class Company(models.Model):
+    -   boss = models.ForeignKey(...)
+    +   bosses = models.ManyToManyField(...)
+  </code></pre>
+</section>
+
 <section>
   <h2>3. Statistical distribution</h2>
 </section>
 
 <section>
-  <h2>Problem: <code>_route_to_regex()</code></h2>
+  <h2><code>_route_to_regex()</code> optimization</h2>
+  <p>Ticket #35252
 </section>
 
 <section>
-  <pre data-id=pre><code class="hljs python" data-trim>
-    from django.urls import path
-    ...
-
+  <pre><code class="hljs python" data-trim>
     urlpatterns = [
         path("/p/&lt;int:user_id&gt;/", views.profile),
     ]
   </code></pre>
-</section>
 
-<section>
-  <pre data-id=pre><code class="hljs python" data-trim>
+  <pre class=fragment><code class="hljs python" data-trim>
     In [1]: _route_to_regex("/p/&lt;int:user_id&gt;/")
     Out[1]:
     ('^/p/(?P&lt;user_id&gt;[0-9]+)/',
@@ -517,10 +551,9 @@
 <section>
   <h3>Data logging</h3>
   <pre><code class="hljs python" data-trim>
-    all_routes = []
-
     import atexit, pprint
 
+    all_routes = []
 
     @atexit.register
     def print_routes():
@@ -573,21 +606,52 @@
 </section>
 
 <section data-background-color="#f8f8f8">
-  <h2>Implications</h2>
-  <ol>
-    <li>Profile your data
-    <li>Check more likely conditions first
-    <li>Add fast paths for common conditions
-    <li>Cache when repetition likely
-  </ol>
+  <h2>Statistical distribution techniques</h2>
+</section>
+
+<section data-background-color="#f8f8f8">
+  <h3>1. Collect metadata</h3>
+  <ul>
+    <li><code>print()</code>
+    <li>Database metrics
+    <li>Production logs, APM tools
+    <li>Heck, even a spreadsheet
+  </ul>
+</section>
+
+<section data-background-color="#f8f8f8">
+  <h3>2. Cache when repetition likely</h3>
+  <ul>
+    <li>HTTP caching
+    <li>Django’s cache framework
+    <li><code>cachetools</code> - in-memory TTL cache
+  </ul>
+</section>
+
+<section data-background-color="#f8f8f8">
+  <h3>3. Check common conditions early</h3>
+  <p><code>AdminEmailHandler</code> - Ticket #35364
+  <pre><code class="hljs python" data-trim>
+    def emit(self, record):
+        # Early return when no email will be sent
+        if not settings.ADMINS:
+            return
+
+        # Render email
+        ...
+
+        # Send email to settings.ADMINS
+        ...
+  </code></pre>
 </section>
 
 <section>
-  <h2>References</h2>
+  <h2>Resources</h2>
   <ul>
-    <li>Casey Muratori: “Clean code, horrible performance”
-    <li>Cal Peterson: “Take the tools out of 'Data', but don't take the data out of the tools”
-    <li>Brandur: “Atlanta, Job Queues, Batch-wise Operations”
+    <li>Casey Muratori - Clean code, horrible performance
+    <li>Cal Peterson - Take the tools out of 'Data', but don't take the data out of the tools
+    <li>Brandur - Atlanta, Job Queues, Batch-wise Operations
+    <li>swyx - Preemptive Pluralization is (Probably) Not Evil
   </ul>
 </section>
 
