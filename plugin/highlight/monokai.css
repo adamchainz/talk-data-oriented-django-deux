@@ -52,9 +52,12 @@ Monokai style - ported by Luigi Maselli - http://grigio.org
   color: #a6e22e;
 }
 
+.hljs-deletion {
+  color: #e22d2d;
+}
+
 .hljs-comment,
 .hljs-quote,
-.hljs-deletion,
 .hljs-meta {
   color: #75715e;
 }
