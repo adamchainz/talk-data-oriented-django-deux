@@ -57,8 +57,7 @@
   <h3>Disassembled</h3>
   <pre><code class="hljs python" data-trim data-line-numbers>
     >>> dis.dis(funk)
-    1           0 RESUME                   0
-
+    ...
     2           2 LOAD_FAST                0 (x)
                 4 POP_JUMP_IF_FALSE        1 (to 8)
 
@@ -68,18 +67,16 @@
                10 POP_JUMP_IF_FALSE        1 (to 14)
 
     5          12 RETURN_CONST             2 (2)
-
-    7     >>   14 RETURN_CONST             3 (3)
+    ...
   </code></pre>
   <p>&nbsp;</p>
 </section>
 
 <section data-auto-animate>
   <h3>Disassembled</h3>
-  <pre><code class="hljs python" data-trim data-line-numbers="5,10">
+  <pre><code class="hljs python" data-trim data-line-numbers="4,9">
     >>> dis.dis(funk)
-    1           0 RESUME                   0
-
+    ...
     2           2 LOAD_FAST                0 (x)
                 4 POP_JUMP_IF_FALSE        1 (to 8)
 
@@ -89,8 +86,7 @@
                10 POP_JUMP_IF_FALSE        1 (to 14)
 
     5          12 RETURN_CONST             2 (2)
-
-    7     >>   14 RETURN_CONST             3 (3)
+    ...
   </code></pre>
   <p class=fragment><code>if</code>, <code>elif</code>, and <code>else</code> gone!</p>
   <!-- they’ve been converted into faster but less safe VM instructions -->
@@ -132,10 +128,10 @@
       <td>Tail-call optimization
     <tr>
       <td>Inlining
-      <td>Parallel execution
+      <td>Register allocation
     <tr>
       <td>Instruction scheduling
-      <td>Register allocation
+      <td>Parallel execution
     <tr>
       <td colspan=2 style="text-align: center">…
   </table>
