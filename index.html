@@ -77,7 +77,7 @@
 <section data-auto-animate>
   <h3>Disassembled</h3>
   <pre><code class="hljs python" data-trim data-line-numbers="5,10">
-    >>> dis.dis(f)
+    >>> dis.dis(funk)
     1           0 RESUME                   0
 
     2           2 LOAD_FAST                0 (x)
@@ -442,7 +442,9 @@
         ...
         ctypes = set()
         for klass in app_config.get_models():
-            ctype = ContentType.objects.get_for_model(klass)
+            ctype = ContentType.objects.get_for_model(
+                klass
+            )
             ctypes.add(ctype)
         ...
   </code></pre>
@@ -452,7 +454,9 @@
   <pre data-id=pre><code class="hljs python" data-trim>
     def create_permissions(...):
         ...
-        ctypes = ContentType.objects.get_for_models(*models)
+        ctypes = ContentType.objects.get_for_models(
+            *models
+        )
         ...
   </code></pre>
 </section>
@@ -627,7 +631,7 @@
     <li><code>print()</code>
     <li>Database metrics
     <li>Production logs, APM tools
-    <li>Heck, even a spreadsheet
+    <li>Heck, even spreadsheets
   </ul>
 </section>
 
