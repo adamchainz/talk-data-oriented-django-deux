@@ -43,7 +43,7 @@
 
 <section>
   <pre><code class="hljs python" data-trim>
-    def f():
+    def funk():
         if x:
             return 1
         elif y:
@@ -56,7 +56,7 @@
 <section data-auto-animate>
   <h3>Disassembled</h3>
   <pre><code class="hljs python" data-trim data-line-numbers>
-    >>> dis.dis(f)
+    >>> dis.dis(funk)
     1           0 RESUME                   0
 
     2           2 LOAD_FAST                0 (x)
@@ -236,7 +236,7 @@
 </section>
 
 <section>
-  <h2>OOP / Row-oriented</h2>
+  <h3>OOP / Row-oriented</h3>
   <pre><code class="hljs python" data-trim>
     class Point:
         def __init__(self, x, y):
@@ -269,7 +269,7 @@
 </section>
 
 <section>
-  <h2>Column-oriented</h2>
+  <h3>Column-oriented</h3>
   <pre><code class="hljs python" data-trim>
     xs = []
     ys = []
@@ -300,7 +300,7 @@
 </section>
 
 <section>
-  <h2>Column-oriented arrays</h2>
+  <h3>Column-oriented arrays</h3>
   <pre><code class="hljs python" data-trim>
     import polars as pl
 
@@ -347,17 +347,17 @@
 </section>
 
 <section>
-  <h2>Row-oriented</h2>
+  <h3>Row-oriented</h3>
   <img src=img/row-oriented.svg class=r-stretch>
 </section>
 
 <section>
-  <h2>Column-oriented</h2>
+  <h3>Column-oriented</h3>
   <img src=img/column-oriented.svg class=r-stretch>
 </section>
 
 <section>
-  <h2>Column-oriented arrays</h2>
+  <h3>Column-oriented arrays</h3>
   <img src=img/column-oriented-arrays.svg class=r-stretch>
   <!-- lookahead -->
 </section>
@@ -386,7 +386,7 @@
 </section>
 
 <section data-background-color="#f8f8f8">
-  <h3>3. Use the right data types</h3>
+  <h3>3. Right-size your fields</h3>
   <pre><code class="hljs python" data-trim>
       class Book(models.Model):
           # Bloated, up to N bytes
@@ -394,6 +394,17 @@
           # Just right, 1 byte
           state = models.PositiveSmallIntegerField(choices=...)
   </code></pre>
+</section>
+
+<section data-background-color="#f8f8f8">
+  <h3>4. Learn data structures</h3>
+  <ul>
+    <li><code>frozenset</code>
+    <li><code>collections</code>: <code>Counter</code>, <code>defaultdict</code>, <code>deque</code>
+    <li><code>heapq</code>
+    <li><code>queue</code>
+    <li><code>graphlib</code>
+  </ul>
 </section>
 
 <section>
@@ -416,11 +427,11 @@
   <pre class=fragment><code class="hljs python" data-trim>
     def emit_post_migrate_signal(...):
         for app_config in apps.get_app_configs():
-            ...
             post_migrate.send(...)
   </code></pre>
 
   <pre class=fragment><code class="hljs python" data-trim>
+    # django.contrib.auth.apps
     post_migrate.connect(create_permissions, ...)
   </code></pre>
 </section>
@@ -448,6 +459,7 @@
 
 <section>
   <h3>🦈 We’re gonna need a bigger batch!</h3>
+  <p>Maybe we could add:</p>
   <pre><code class="hljs python" data-trim>
     def emit_post_migrate_signal(...):
         # All apps at once!
@@ -455,7 +467,6 @@
 
         # Legacy.
         for app_config in apps.get_app_configs():
-            ...
             post_migrate.send(...)
   </code></pre>
 </section>
@@ -511,7 +522,7 @@
 </section>
 
 <section>
-  <h2><code>_route_to_regex()</code> optimization</h2>
+  <h3><code>_route_to_regex()</code> optimization</h3>
   <p>Ticket #35252
 </section>
 
@@ -647,7 +658,7 @@
 </section>
 
 <section>
-  <h2>Resources</h2>
+  <h3>Resources</h3>
   <ul>
     <li>Casey Muratori - Clean code, horrible performance
     <li>Cal Peterson - Take the tools out of 'Data', but don't take the data out of the tools
@@ -657,7 +668,7 @@
 </section>
 
 <section>
-  <h2>Thank you! 🤗</h2>
+  <h3>Thank you! 🤗</h3>
   <ul>
     <li><a href=https://adamj.eu/contact>adamj.eu/contact</a>
     <li><a href=https://github.com/adamchainz/talk-data-oriented-django-deux>github.com/adamchainz/talk-data-oriented-django-deux</a>
